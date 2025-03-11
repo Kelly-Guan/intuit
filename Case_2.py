@@ -43,6 +43,7 @@ to adjust the forecasts more dynamically. This could involve accessing external 
 
 
 from collections import defaultdict
+from datetime import datetime
 
 
 # simple moving avg of last three months - unweighted
@@ -75,8 +76,7 @@ def weighted_moving_average_last3(expense_data):
 
     for category, expenses in expense_data.items():
         weighted_avg = 0
-        last_expenses = expenses[-3:]
-        for w, x in zip(weights, last_expenses):
+        for w, x in zip(weights, expenses[-3:]):
             weighted_avg += w * x 
         predicted_cost_dict[category] = round(weighted_avg)  # Round to nearest integer
 
@@ -94,30 +94,36 @@ Modify the predictions from part 2 by factoring in the inflation-adjusted growth
 Adjusted Forecast = Weighted Moving Average Prediction x (1 + Inflation Rate / 100)
 
 
+- Annual Inflation Rate (%)
+    - office supplies - high inflation impact 
+    - marketing - low inflation impact 
+    - utiltities - sensitive to economic changes 
+    - rent - less sensitive but potential impact 
+
+- Industry Growth Rate (%)
+
+- Seasonal Factor 
+    - office supplies - more expensive in back to school season 
+    - marketing - more expenseve during holdiary seasons 
+    - utiltities - more expensive in weather temperments 
+    - rent - no seasonal patterns 
+
 '''
 
+indicators = {
+    'inflation_rate': 2.5,  
+    'industry_growth': 1.8,  
+    'consumer_confidence': 0.0, 
+    'seasonal_factor': 1.0,  
+}
 
-# def get_inflation_rate():
-    # try:
-    #     # Fetch data from a real API 
-    #     # response = requests.get("https://api.example.com/inflation-rate")
-    #     # data = response.json()
-    #     # return data.get("inflation_rate", 0)  # Default to 0 if not found
-    # except Exception:
-    #     return 2.5  
+def econmic_impact(indicators): 
+    current_month = datetime.now().month
+    if 10 <= current_month <= 12:
+        indicators["seasonal_factor"] = 1.15 # Q4 has increase 
+    elif 1 <= current_month <= 3:
+        indicators["seasonal_factor"] = 0.95 # Q1 has decrease 
 
-# Adjust predictions based on external inflation data
-def adjusted_forecast(expense_data):
-    base_forecast = weighted_moving_average_last3(expense_data)
-    # inflation_rate = get_inflation_rate()
-    inflation_rate = 2.5
-
-    adjusted_predictions = {}
-    for category, predicted_value in base_forecast.items():
-        adjustment_factor = 1 + (inflation_rate / 100)
-        adjusted_predictions[category] = round(predicted_value * adjustment_factor)
-
-    return adjusted_predictions
 
 
 expense_data = {  
@@ -127,4 +133,3 @@ expense_data = {
     "Rent": [1000, 1000, 1000, 1000, 1000]  
 }
 
-print(adjusted_forecast(expense_data))
