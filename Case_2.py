@@ -42,6 +42,8 @@ to adjust the forecasts more dynamically. This could involve accessing external 
 '''
 
 
+# Please note the ui - associated with this is to be able to visualize my solution - not entirely my own 
+
 from collections import defaultdict
 from datetime import datetime
 
